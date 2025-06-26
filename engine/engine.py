@@ -1,4 +1,5 @@
 import pygame
+from nautilus.input import InputManager
 
 class Engine:
 
@@ -11,6 +12,8 @@ class Engine:
 
         self.dt = 0
         self.tickrate = 60
+
+        self.input_manager = InputManager()
 
         self.running = False
 
@@ -33,10 +36,10 @@ class Engine:
 
 
     def handle_events(self):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.end()
+        self.input_manager.update()
 
+        if self.input_manager.is_input_exit():
+            self.end()
 
     def update(self):
         pass
