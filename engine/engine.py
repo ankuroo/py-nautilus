@@ -1,4 +1,4 @@
-import pygame
+import pygame, platform
 
 class Engine:
 
@@ -8,11 +8,24 @@ class Engine:
         self.resolution = resolution
         self.screen = pygame.display.set_mode(resolution)  # test small size
         self.clock = pygame.time.Clock()
+        self.os = self._detect_os()
 
         self.dt = 0
         self.tickrate = 60
 
         self.running = False
+
+    def _detect_os(self):
+        _platform = platform.system()
+        if _platform == "Windows":
+            return "Windows"
+        elif _platform == "Linux":
+            return "Linux"
+        elif _platform == "Darwin":
+            return "Mac OS X"
+        else:
+            return "Unsupported"
+
 
     def render(self):
         self.screen.fill((0,0,0))
