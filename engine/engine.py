@@ -3,12 +3,16 @@ import pygame, platform
 class Engine:
 
     def __init__(self, title='Game', resolution=(1920, 1080)):
+        self.os = self._detect_os()
+
+        if self.os == "Unsupported":
+            raise SystemExit("This OS is currently not supported by the engine.")
+
         pygame.display.init()
         pygame.display.set_caption(title)
         self.resolution = resolution
         self.screen = pygame.display.set_mode(resolution)  # test small size
         self.clock = pygame.time.Clock()
-        self.os = self._detect_os()
 
         self.dt = 0
         self.tickrate = 60
