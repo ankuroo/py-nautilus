@@ -1,4 +1,6 @@
-import pygame, platform
+import pygame
+import platform
+from nautilus.scene import SceneManager
 
 class Engine:
 
@@ -17,6 +19,8 @@ class Engine:
         self.dt = 0
         self.tickrate = 60
 
+        self.scene_manager = SceneManager(self)
+
         self.running = False
 
     def _detect_os(self):
@@ -33,6 +37,9 @@ class Engine:
 
     def render(self):
         self.screen.fill((0,0,0))
+        if self.scene_manager.active_scene:
+            self.scene_manager.active_scene.render()
+
         pygame.display.flip()
 
     def run(self):
@@ -56,7 +63,8 @@ class Engine:
 
 
     def update(self):
-        pass
+        if self.scene_manager.active_scene:
+            self.scene_manager.active_scene.update(self.dt)
 
     def end(self):
         self.running = False
