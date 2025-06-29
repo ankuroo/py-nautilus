@@ -72,6 +72,9 @@ class InputManager:
             return None
         return self.get_controller_by_id(self.controller_ids[index])
 
+    def get_controller_count(self):
+        return len(self.controllers)
+
     def scan_controllers(self):
         for joystick_index in range(pygame.joystick.get_count()):
             self._controller_added(joystick_index)
