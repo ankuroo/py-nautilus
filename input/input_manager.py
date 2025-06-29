@@ -80,8 +80,9 @@ class InputManager:
     def _controller_added(self, joystick_index: int):
         _joystick = pygame.joystick.Joystick(joystick_index)
         _controller = Controller(_joystick)
-        self.controller_ids.append(_controller.instance_id)
-        self.controllers[_controller.instance_id] = _controller
+        if _controller.instance_id not in self.controllers:
+            self.controller_ids.append(_controller.instance_id)
+            self.controllers[_controller.instance_id] = _controller
 
     def _controller_removed(self, instance_id):
         controller = self.controllers.pop(instance_id, None)
