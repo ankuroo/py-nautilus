@@ -25,6 +25,12 @@ class Controller:
         self.current_frame_buttons = set()
         self.last_frame_buttons = set()
 
+    def button_down(self, button):
+        self.current_frame_buttons.add(button)
+
+    def button_up(self, button):
+        self.current_frame_buttons.discard(button)
+
     def was_button_pressed(self, button):
         return button in self.current_frame_buttons and button not in self.last_frame_buttons
 
@@ -32,4 +38,7 @@ class Controller:
         return button not in self.current_frame_buttons and button in self.last_frame_buttons
 
     def is_button_held(self, button):
-        return button in self.current_frame_buttons and button not in self.last_frame_buttons
+        return button in self.current_frame_buttons and button in self.last_frame_buttons
+        
+    def update(self):
+        self.last_frame_buttons = self.current_frame_buttons.copy()
