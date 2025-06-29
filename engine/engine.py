@@ -1,21 +1,27 @@
 import pygame
 import platform
 from nautilus.input import InputManager
+from nautilus.scene import SceneManager
 
 class Engine:
 
     def __init__(self, title='Game', resolution=(1920, 1080)):
+        self.os = self._detect_os()
+
+        if self.os == "Unsupported":
+            raise SystemExit("This OS is currently not supported by the engine.")
+
         pygame.display.init()
         pygame.display.set_caption(title)
         self.resolution = resolution
         self.screen = pygame.display.set_mode(resolution)  # test small size
         self.clock = pygame.time.Clock()
-        self.os = self._detect_os()
 
         self.dt = 0
         self.tickrate = 60
 
         self.input_manager = InputManager()
+        self.scene_manager = SceneManager(self)
 
         self.running = False
 
@@ -33,6 +39,9 @@ class Engine:
 
     def render(self):
         self.screen.fill((0,0,0))
+        if self.scene_manager.active_scene:
+            self.scene_manager.active_scene.render()
+
         pygame.display.flip()
 
     def run(self):
@@ -56,7 +65,8 @@ class Engine:
             self.end()
 
     def update(self):
-        pass
+        if self.scene_manager.active_scene:
+            self.scene_manager.active_scene.update(self.dt)
 
     def end(self):
         self.running = False
