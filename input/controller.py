@@ -1,5 +1,18 @@
 import pygame
 
+from enum import Enum
+
+class HatDirection(Enum):
+    NEUTRAL = (0, 0)
+    UP = (0, 1)
+    DOWN = (0, -1)
+    LEFT = (-1, 0)
+    RIGHT = (1, 0)
+    UP_LEFT = (-1, 1)
+    UP_RIGHT = (1, 1)
+    DOWN_LEFT = (-1, -1)
+    DOWN_RIGHT = (1, -1)
+
 def detect_layout(guid: str, name: str):
     if "PlayStation" in name or "DualSense" in name or "Sony" in name:
         return "PlayStation"
@@ -22,8 +35,40 @@ class Controller:
         self.guid = joystick.get_guid()
         self.layout = detect_layout(self.guid, self.name)
 
+        self.hat_count = self.joystick.get_numhats()
+        self.current_frame_hats = {}
+        self.last_frame_hats = {}
+
         self.current_frame_buttons = set()
         self.last_frame_buttons = set()
+
+    def get_hat_direction(self, hat_idx=0):
+        return self.current_frame_hats.get(hat_idx, (0,0))
+
+    def hat_changed(self, hat_idx=0):
+        return hat_idx in self.current_frame_hats and hat_idx in self.last_frame_hats and self.current_frame_hats[hat_idx] != self.last_frame_hats[hat_idx]
+
+    def was_hat_pressed(self, hat_idx=0, direction=HatDirection.UP):
+        dir_value = direction.value if isinstance(direction, HatDirection) else direction
+        return (
+            self.current_frame_hats.get(hat_idx) == dir_value and
+            self.last_frame_hats.get(hat_idx) != dir_value
+        )
+
+    def was_hat_released(self, hat_idx=0, direction=HatDirection.UP):
+        dir_value = direction.value if isinstance(direction, HatDirection) else direction
+        return (
+            self.current_frame_hats.get(hat_idx) != dir_value and
+            self.last_frame_hats.get(hat_idx) == dir_value
+        )
+
+    def is_hat_held(self, hat_idx=0, direction=HatDirection.UP):
+        dir_value = direction.value if isinstance(direction, HatDirection) else direction
+        return (
+            self.current_frame_hats.get(hat_idx) == dir_value and
+            self.last_frame_hats.get(hat_idx) == dir_value
+        )
+
 
     def button_down(self, button):
         self.current_frame_buttons.add(button)
@@ -42,3 +87,8 @@ class Controller:
         
     def update(self):
         self.last_frame_buttons = self.current_frame_buttons.copy()
+        self.last_frame_hats = self.current_frame_hats.copy()
+
+        self.current_frame_hats = {
+            i: self.joystick.get_hat(i) for i in range(self.hat_count)
+        }
