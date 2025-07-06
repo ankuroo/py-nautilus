@@ -1,6 +1,7 @@
 import pygame
 import platform
 from nautilus.scene import SceneManager
+from nautilus.graphics import Renderer
 
 class Engine:
 
@@ -20,6 +21,9 @@ class Engine:
         self.tickrate = 60
 
         self.scene_manager = SceneManager(self)
+        self.renderer = Renderer()
+
+        self.renderer.set_screen(self.screen)
 
         self.running = False
 
@@ -36,11 +40,10 @@ class Engine:
 
 
     def render(self):
-        self.screen.fill((0,0,0))
         if self.scene_manager.active_scene:
             self.scene_manager.active_scene.render()
 
-        pygame.display.flip()
+        self.renderer.draw()
 
     def run(self):
         self.running = True
