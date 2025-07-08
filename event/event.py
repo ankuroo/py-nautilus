@@ -1,8 +1,8 @@
 from enum import Enum
 import time
 
-class EventType(Enum):
-    GENERIC="generic"
+class EventType(str, Enum):
+    pass
 
 class Event:
 
