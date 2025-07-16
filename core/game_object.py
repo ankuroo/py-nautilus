@@ -4,11 +4,12 @@ class GameObject:
 
     def __init__(self, name="GameObject"):
         self.name = name
-        self.components = {}
-        self.active = True
-        self.parent = None
-        self.children = []
-        self.started = False
+        self.components: dict[Component] = {}
+        self.active: bool = True
+        self.parent: GameObject = None
+        self.children: list[GameObject] = []
+        self.started: bool = False
+        self.scene = None
 
     def _is_ancestor_of(self, obj):
         current = obj
