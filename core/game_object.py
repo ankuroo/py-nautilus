@@ -2,13 +2,15 @@ from .component import Component
 
 class GameObject:
 
-    def __init__(self, name="GameObject"):
+    def __init__(self, name="GameObject", tags: set[str] = None):
         self.name = name
-        self.components = {}
-        self.active = True
-        self.parent = None
-        self.children = []
-        self.started = False
+        self.components: dict[Component] = {}
+        self.active: bool = True
+        self.parent: GameObject = None
+        self.children: list[GameObject] = []
+        self.started: bool = False
+        self.scene = None
+        self.tags = tags or set()
 
     def _is_ancestor_of(self, obj):
         current = obj
@@ -91,6 +93,18 @@ class GameObject:
                     component.set_owner(None)
                 del self.components[component_or_class]
 
+    def add_tag(self, tag: str):
+        self.tags.add(tag)
+
+        if self.scene:
+            self.scene.register_tagged_object(tag, self)
+
+    def remove_tag(self, tag: str):
+        self.tags.discard(tag)
+
+        if self.scene:
+            self.scene.unregister_tagged_object(tag, self)
+
     def set_parent(self, parent):
         if self.parent == parent:
             return
@@ -145,3 +159,4 @@ class GameObject:
 
         self.started = False
         self.active = False
+        self.scene = None
