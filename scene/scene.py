@@ -80,6 +80,9 @@ class Scene:
         for child in g_object.children:
             self._unregister_tagged_objects_recursive(child)
 
+    def set_active_camera(self, camera):
+        self.active_camera = camera
+
     def set_screen(self, screen):
         self.screen = screen
 

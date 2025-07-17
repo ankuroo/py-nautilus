@@ -21,7 +21,7 @@ class Engine:
         self.tickrate = 60
 
         self.scene_manager = SceneManager(self)
-        self.renderer = Renderer()
+        self.renderer = Renderer(self)
 
         self.renderer.set_screen(self.screen)
 
