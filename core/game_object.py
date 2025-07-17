@@ -137,14 +137,18 @@ class GameObject:
 
     def render(self):
         if not self.active:
-            return
+            return []
+
+        _calls = []
 
         for components in self.components.values():
             for component in components:
-                component.render()
+                _calls.extend(component.render())
 
         for child in self.children:
-            child.render()
+            _calls.extend(child.render())
+
+        return _calls
 
     def stop(self):
         if not self.started:

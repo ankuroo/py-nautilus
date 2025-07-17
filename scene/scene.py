@@ -93,7 +93,8 @@ class Scene:
         self.root.update(dt)
 
     def render(self):
-        self.root.render()
+        calls = self.root.render()
+        self.scene_manager.engine.renderer.add_draw_calls(calls)
 
     def stop(self):
         self.root.stop()
