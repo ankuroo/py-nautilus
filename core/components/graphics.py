@@ -21,3 +21,22 @@ class SpriteRenderer(Component):
             DrawType.SPRITE,
             self.layer
         )]
+
+class LineRenderer(Component):
+
+    def __init__(self, points: list[Vector2]):
+        super().__init__()
+        self.points = points
+        self.layer = RenderLayer.WORLD
+
+    def set_layer(self, layer):
+        self.layer = layer
+
+    def render(self):
+        _transform: Transform = self.owner.get_component(Transform) if self.owner else None
+        return [DrawCall(
+            self.points,
+            _transform.get_global_position() if _transform else Vector2(0,0),
+            DrawType.LINE,
+            self.layer
+        )]

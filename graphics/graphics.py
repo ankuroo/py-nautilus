@@ -21,8 +21,8 @@ class DrawSpace(Enum):
 
 class DrawCall():
 
-    def __init__(self, surface, position: Vector2, type: DrawType, layer: RenderLayer, space: DrawSpace= DrawSpace.WORLD):
-        self.surface = surface
+    def __init__(self, data, position: Vector2, type: DrawType, layer: RenderLayer, space: DrawSpace= DrawSpace.WORLD):
+        self.data = data
         self.position = position
         self.type = type
         self.layer = layer
