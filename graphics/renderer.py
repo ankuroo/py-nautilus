@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 from ..core.math import Vector2
 from .graphics import DrawCall, DrawSpace, DrawType
 
@@ -24,35 +24,59 @@ class Renderer:
 
         camera = self.engine.scene_manager.active_scene.active_camera
 
-        self.draw_calls.sort(key=lambda c: (c.layer.value, c.position.y))
+        self.draw_calls.sort(key=lambda c: (c.layer.value, -c.position.y, c.order_in_layer))
 
         for call in self.draw_calls:
             _position = camera.world_to_screen(call.position) if call.space == DrawSpace.WORLD else call.position
             if call.type == DrawType.SPRITE:
-                self._draw_sprite(call.data, _position, camera.get_zoom())
+                self._draw_sprite(call, _position, camera)
 
             elif call.type == DrawType.LINE:
-                self._draw_line(call.data, _position, camera.get_zoom())
+                self._draw_line(call, _position, camera)
 
             elif call.type in [DrawType.CURVE, DrawType.POLYGON]:
                 raise NotImplementedError(f"Draw type '{call.type.value}' not yet implemented.")
 
         pygame.display.flip()
 
-    def _draw_sprite(self, surface: pygame.Surface, position: Vector2, zoom: float|int = 1.0):
-        if zoom != 1:
-            surface = pygame.transform.scale_by(surface, zoom)
-        self.screen.blit(surface, position.to_tuple())
+    def _draw_sprite(self, call: DrawCall, position: Vector2, camera):
 
-    def _draw_line(self, points: list[Vector2], position: Vector2, zoom: float|int = 1.0):
+        surface: pygame.Surface = call.data
 
-        _points = [((point * zoom) + position).to_tuple() for point in points]
+        if camera.get_zoom() * call.scale != Vector2(1,1) or call.rotation != 0:
+            (scaled_x, scaled_y) = (camera.get_zoom() * call.scale * Vector2(*surface.get_size())).to_tuple()
+            surface = pygame.transform.scale(call.data, (int(scaled_x), int(scaled_y)))
+            angle = -call.rotation
+            surface = pygame.transform.rotate(surface, angle)
 
-        pygame.draw.lines(self.screen, (255, 255, 255), False, _points, int(1 * zoom))
+        rect = surface.get_rect(center=(int(position.x), int(position.y)))
+
+        self.screen.blit(surface, rect.topleft)
+
+    def _draw_line(self, call, position, camera):
+        zoom = camera.get_zoom()
+        angle_rad = math.radians(call.rotation)
+
+        cos_a = math.cos(angle_rad)
+        sin_a = math.sin(angle_rad)
+
+        _points = []
+        for point in call.data:
+            # Rotate point
+            rotated_x = point.x * cos_a - point.y * sin_a
+            rotated_y = point.x * sin_a + point.y * cos_a
+
+            # Apply zoom and position offset
+            screen_x = int(rotated_x * zoom + position.x)
+            screen_y = int(rotated_y * zoom + position.y)
+
+            _points.append((screen_x, screen_y))
+
+        line_width = max(1, int(1 * zoom))
+        pygame.draw.lines(self.screen, (255, 255, 255), False, _points, line_width)
 
     def set_screen(self, screen):
         self.screen = screen
-
 
     def draw(self):
         if not self.screen:
