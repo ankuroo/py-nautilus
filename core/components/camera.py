@@ -11,6 +11,7 @@ class Camera(Component):
         self.min_zoom = 1
         self.max_zoom = 2
         self.zoom = 1
+        self.base_zoom_multiplier = 10
 
     def start(self):
         super().start()
@@ -23,7 +24,7 @@ class Camera(Component):
         return (position - (self.viewport_size / 2)) / self.zoom + self.transform.get_global_position()
 
     def get_zoom(self):
-        return self.zoom
+        return self.zoom * self.base_zoom_multiplier
 
     def set_bg_color(self, color: tuple[int, int, int]):
         self.bg_color = color

@@ -34,6 +34,9 @@ class Renderer:
             elif call.type == DrawType.LINE:
                 self._draw_line(call, _position, camera)
 
+            elif call.type == DrawType.POLYGON:
+                self._draw_polygon(call, _position, camera)
+
             elif call.type in [DrawType.CURVE, DrawType.POLYGON]:
                 raise NotImplementedError(f"Draw type '{call.type.value}' not yet implemented.")
 
@@ -74,6 +77,25 @@ class Renderer:
 
         line_width = max(1, int(1 * zoom))
         pygame.draw.lines(self.screen, (255, 255, 255), False, _points, line_width)
+
+    def _draw_polygon(self, call, position, camera):
+        zoom = camera.get_zoom()
+        angle_rad = math.radians(call.rotation)
+
+        cos_a = math.cos(angle_rad)
+        sin_a = math.sin(angle_rad)
+
+        _points = []
+        for point in call.data["points"]:
+            rotated_x = point.x * cos_a - point.y * sin_a
+            rotated_y = point.x * sin_a + point.y * cos_a
+
+            screen_x = int(rotated_x * zoom + position.x)
+            screen_y = int(rotated_y * zoom + position.y)
+
+            _points.append((screen_x, screen_y))
+
+        pygame.draw.polygon(self.screen, call.data['color'], _points)
 
     def set_screen(self, screen):
         self.screen = screen
