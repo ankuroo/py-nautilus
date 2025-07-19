@@ -11,7 +11,7 @@ class Camera(Component):
         self.min_zoom = 1
         self.max_zoom = 2
         self.zoom = 1
-        self.base_zoom_multiplier = 10
+        self.base_zoom_multiplier = 1
 
     def start(self):
         super().start()

@@ -1,5 +1,5 @@
 import pygame, math
-from ..core.math import Vector2
+from ..core.math import Vector2, utils
 from .graphics import DrawCall, DrawSpace, DrawType
 
 class Renderer:
@@ -37,8 +37,8 @@ class Renderer:
             elif call.type == DrawType.POLYGON:
                 self._draw_polygon(call, _position, camera)
 
-            elif call.type in [DrawType.CURVE, DrawType.POLYGON]:
-                raise NotImplementedError(f"Draw type '{call.type.value}' not yet implemented.")
+            elif call.type == DrawType.CURVE:
+                self._draw_curve(call, _position, camera)
 
         pygame.display.flip()
 
@@ -96,6 +96,47 @@ class Renderer:
             _points.append((screen_x, screen_y))
 
         pygame.draw.polygon(self.screen, call.data['color'], _points)
+
+    def _draw_curve(self, call, position, camera):
+        points = call.data['points']
+        color = call.data['color']
+        segments = call.data['segments']
+        zoom = camera.get_zoom()
+        angle_rad = math.radians(call.rotation)
+
+        cos_a = math.cos(angle_rad)
+        sin_a = math.sin(angle_rad)
+
+        curve_points = []
+        n = len(points)
+
+        if n < 2:
+            return
+
+        if n == 2:
+            self._draw_line(call, position, camera)
+            return
+
+        padded_points = [points[0], points[0]] + points + [points[-1], points[-1]]
+        n = len(padded_points)
+
+        for i in range(n-3):
+            p0, p1, p2, p3 = padded_points[i:i+4]
+
+            for step in range(segments + 1):
+                t = step / segments
+                pt = utils.catmull_rom(p0, p1, p2, p3, t)
+
+                rotated_x = pt.x * cos_a - pt.y * sin_a
+                rotated_y = pt.x * sin_a + pt.y * cos_a
+                screen_x = int(rotated_x * zoom + position.x)
+                screen_y = int(rotated_y * zoom + position.y)
+
+                curve_points.append((screen_x, screen_y))
+        
+        if len(curve_points) > 1:
+            line_width = max(1, int(1 * zoom))
+            pygame.draw.lines(self.screen, color, False, curve_points, line_width)
 
     def set_screen(self, screen):
         self.screen = screen
