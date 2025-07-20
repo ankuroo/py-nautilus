@@ -23,6 +23,7 @@ class Renderer:
             return
 
         camera = self.engine.scene_manager.active_scene.active_camera
+        camera.viewport.fill(camera.bg_color)
 
         self.draw_calls.sort(key=lambda c: (c.layer.value, -c.position.y, c.order_in_layer))
 
@@ -40,24 +41,34 @@ class Renderer:
             elif call.type == DrawType.CURVE:
                 self._draw_curve(call, _position, camera)
 
+        absolute_bounds = (
+            (camera.viewport_bounds[0] * Vector2(*self.engine.resolution)),
+            (camera.viewport_bounds[1] * Vector2(*self.engine.resolution))
+        )
+
+        surface = pygame.transform.scale(camera.viewport, (absolute_bounds[1] - absolute_bounds[0]).to_tuple())
+
+        self.screen.blit(surface, absolute_bounds[0].to_tuple())
+
         pygame.display.flip()
 
     def _draw_sprite(self, call: DrawCall, position: Vector2, camera):
 
         surface: pygame.Surface = call.data
+        zoom = camera.get_zoom() * (camera.viewport_size.x / self.engine.resolution[0])
 
-        if camera.get_zoom() * call.scale != Vector2(1,1) or call.rotation != 0:
-            (scaled_x, scaled_y) = (camera.get_zoom() * call.scale * Vector2(*surface.get_size())).to_tuple()
+        if zoom * call.scale != Vector2(1,1) or call.rotation != 0:
+            (scaled_x, scaled_y) = (zoom * call.scale * Vector2(*surface.get_size())).to_tuple()
             surface = pygame.transform.scale(call.data, (int(scaled_x), int(scaled_y)))
             angle = -call.rotation
             surface = pygame.transform.rotate(surface, angle)
 
         rect = surface.get_rect(center=(int(position.x), int(position.y)))
 
-        self.screen.blit(surface, rect.topleft)
+        camera.viewport.blit(surface, rect.topleft)
 
     def _draw_line(self, call, position, camera):
-        zoom = camera.get_zoom()
+        zoom = camera.get_zoom() * (camera.viewport_size.x / self.engine.resolution[0])
         angle_rad = math.radians(call.rotation)
 
         cos_a = math.cos(angle_rad)
@@ -76,10 +87,10 @@ class Renderer:
             _points.append((screen_x, screen_y))
 
         line_width = max(1, int(1 * zoom))
-        pygame.draw.lines(self.screen, (255, 255, 255), False, _points, line_width)
+        pygame.draw.lines(camera.viewport, (255, 255, 255), False, _points, line_width)
 
     def _draw_polygon(self, call, position, camera):
-        zoom = camera.get_zoom()
+        zoom = camera.get_zoom() * (camera.viewport_size.x / self.engine.resolution[0])
         angle_rad = math.radians(call.rotation)
 
         cos_a = math.cos(angle_rad)
@@ -95,13 +106,13 @@ class Renderer:
 
             _points.append((screen_x, screen_y))
 
-        pygame.draw.polygon(self.screen, call.data['color'], _points)
+        pygame.draw.polygon(camera.viewport, call.data['color'], _points)
 
     def _draw_curve(self, call, position, camera):
         points = call.data['points']
         color = call.data['color']
         segments = call.data['segments']
-        zoom = camera.get_zoom()
+        zoom = camera.get_zoom() * (camera.viewport_size.x / self.engine.resolution[0])
         angle_rad = math.radians(call.rotation)
 
         cos_a = math.cos(angle_rad)
@@ -136,7 +147,7 @@ class Renderer:
         
         if len(curve_points) > 1:
             line_width = max(1, int(1 * zoom))
-            pygame.draw.lines(self.screen, color, False, curve_points, line_width)
+            pygame.draw.lines(camera.viewport, color, False, curve_points, line_width)
 
     def set_screen(self, screen):
         self.screen = screen
