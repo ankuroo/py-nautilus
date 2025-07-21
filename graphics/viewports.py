@@ -1,5 +1,5 @@
 import pygame
-from ..math.utils import point_in_aabb
+from ..core.math.utils import point_in_aabb
 
 class Viewport():
 
