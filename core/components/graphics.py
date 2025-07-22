@@ -5,11 +5,12 @@ from ...graphics import DrawCall, DrawType, RenderLayer
 
 class SpriteRenderer(Component):
 
-    def __init__(self, sprite):
+    def __init__(self, sprite, render_tags: set[str]=None):
         super().__init__()
         self.sprite = sprite
         self.layer = RenderLayer.WORLD
         self.order_in_layer = 0
+        self.render_tags = render_tags if render_tags else set(["all"])
 
     def set_layer(self, layer):
         self.layer = layer
@@ -26,16 +27,18 @@ class SpriteRenderer(Component):
             rotation= _transform.get_global_rotation() if _transform else 0,
             order_in_layer= self.order_in_layer,
             type= DrawType.SPRITE,
-            layer= self.layer
+            layer= self.layer,
+            render_tags= self.render_tags
         )]
 
 class LineRenderer(Component):
 
-    def __init__(self, points: list[Vector2]):
+    def __init__(self, points: list[Vector2], render_tags: set[str]= None):
         super().__init__()
         self.points = points
         self.layer = RenderLayer.WORLD
         self.order_in_layer = 0
+        self.render_tags = render_tags if render_tags else set(["all"])
 
     def set_layer(self, layer):
         self.layer = layer
@@ -53,17 +56,19 @@ class LineRenderer(Component):
             rotation= _transform.get_global_rotation() if _transform else 0,
             order_in_layer=self.order_in_layer,
             type=DrawType.LINE,
-            layer= self.layer
+            layer= self.layer,
+            render_tags= self.render_tags
         )]
 
 class PolygonRenderer(Component):
 
-    def __init__(self, points, color= (255,255,255)):
+    def __init__(self, points, color= (255,255,255), render_tags: set[str]= None):
         super().__init__()
         self.points = points
         self.color = color
         self.layer = RenderLayer.WORLD
         self.order_in_layer = 0
+        self.render_tags = render_tags if render_tags else set(["all"])
 
     def set_layer(self, layer):
         self.layer = layer
@@ -81,19 +86,21 @@ class PolygonRenderer(Component):
             rotation= _transform.get_global_rotation() if _transform else 0,
             order_in_layer=self.order_in_layer,
             type=DrawType.POLYGON,
-            layer= self.layer
+            layer= self.layer,
+            render_tags= self.render_tags
             )
         ]
 
 class CurveRenderer(Component):
 
-    def __init__(self, points, color= (255,255,255), resolution: int= 10):
+    def __init__(self, points, color= (255,255,255), resolution: int= 10, render_tags: set[str]= None):
         super().__init__()
         self.points = points
         self.color = color
         self.resolution = max(1, min(20, resolution))
         self.layer = RenderLayer.WORLD
         self.order_in_layer = 0
+        self.render_tags = render_tags if render_tags else set(["all"])
 
     def set_layer(self, layer):
         self.layer = layer
@@ -111,6 +118,7 @@ class CurveRenderer(Component):
             rotation= _transform.get_global_rotation() if _transform else 0,
             order_in_layer=self.order_in_layer,
             type=DrawType.CURVE,
-            layer= self.layer
+            layer= self.layer,
+            render_tags= self.render_tags
             )
         ]

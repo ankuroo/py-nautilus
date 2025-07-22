@@ -1,7 +1,7 @@
 import pygame
 import platform
 from nautilus.scene import SceneManager
-from nautilus.graphics import Renderer
+from nautilus.graphics import Renderer, ViewportManager
 
 class Engine:
 
@@ -20,8 +20,9 @@ class Engine:
         self.dt = 0
         self.tickrate = 60
 
-        self.scene_manager = SceneManager(self)
         self.renderer = Renderer(self)
+        self.scene_manager = SceneManager(self)
+        self.viewport_manager = ViewportManager(self)
 
         self.renderer.set_screen(self.screen)
 
@@ -44,6 +45,7 @@ class Engine:
             self.scene_manager.active_scene.render()
 
         self.renderer.draw()
+        pygame.display.flip()
 
     def run(self):
         self.running = True

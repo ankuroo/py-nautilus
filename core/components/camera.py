@@ -10,9 +10,11 @@ class Camera(Component):
     def __init__(self, viewport_size: Vector2, viewport_bounds: tuple[Vector2, Vector2]= None, bg_color: tuple[int, int, int]= (0, 0, 0)):
         super().__init__()
 
+        self.render_tags = set(["all"])
+
         # Viewport Settings
         self.viewport_size = viewport_size
-        self.viewport = pygame.Surface(viewport_size.to_tuple(), pygame.SRCALPHA)
+        self.render_target = pygame.Surface(viewport_size.to_tuple(), pygame.SRCALPHA)
         self.viewport_bounds = viewport_bounds if viewport_bounds else (Vector2(0,0), Vector2(1,1))
 
         self.bg_color = bg_color
@@ -26,6 +28,23 @@ class Camera(Component):
     def start(self):
         super().start()
         self.transform: Transform = self.owner.get_component(Transform) or Transform()
+
+    def add_render_tags(self, tags: list[str]):
+        for tag in tags:
+            self.render_tags.add(tag)
+
+    def remove_render_tags(self, tags: list[str]):
+        for tag in tags:
+            self.render_tags.discard(tag)
+
+    def toggle_render_tag(self, tag: str):
+        if tag in self.render_tags:
+            self.render_tags.remove(tag)
+        else:
+            self.render_tags.add(tag)
+
+    def clear_render_tags(self):
+        self.render_tags.clear()
 
     def world_to_screen(self, position):
         return (position - self.transform.get_global_position()) * self.get_zoom() + (self.viewport_size / 2)
