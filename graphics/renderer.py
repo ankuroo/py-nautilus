@@ -19,7 +19,7 @@ class Renderer:
     def dispatch_draw_calls(self, calls, viewport):
         
         camera = viewport.camera
-        calls.sort(key=lambda c: (c.layer.value, -c.position.y, c.order_in_layer))
+        calls.sort(key=lambda c: (c.layer.value, c.position.y, c.order_in_layer))
 
         for call in calls:
             _position = camera.world_to_screen(call.position) if call.space == DrawSpace.WORLD else call.position
