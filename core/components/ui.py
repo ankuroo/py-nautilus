@@ -1,5 +1,5 @@
 from .. import Component
-from ..math import Vector2
+from ..math import Vector2, utils
 
 class UITransform(Component):
 
@@ -89,16 +89,28 @@ class UITransform(Component):
             raise TypeError("Scale must be a Vector2, float, or integer.")
 
     def set_anchor_min(self, anchor_min: Vector2):
-        #TODO
-        pass
+        if not isinstance(anchor_min, Vector2):
+            raise TypeError("anchor_min must be a Vector2.")
+
+        clamped_x = utils.clamp(anchor_min.x, 0, 1)
+        clamped_y = utils.clamp(anchor_min.y, 0, 1)
+        self.anchor_min = Vector2(clamped_x, clamped_y)
 
     def set_anchor_max(self, anchor_max: Vector2):
-        #TODO
-        pass
+        if not isinstance(anchor_max, Vector2):
+            raise TypeError("anchor_max must be a Vector2.")
+
+        clamped_x = utils.clamp(anchor_max.x, 0, 1)
+        clamped_y = utils.clamp(anchor_max.y, 0, 1)
+        self.anchor_max = Vector2(clamped_x, clamped_y)
 
     def set_pivot(self, pivot: Vector2):
-        #TODO
-        pass
+        if not isinstance(pivot, Vector2):
+            raise TypeError("pivot must be a Vector2.")
+
+        clamped_x = utils.clamp(pivot.x, 0, 1)
+        clamped_y = utils.clamp(pivot.y, 0, 1)
+        self.pivot = Vector2(clamped_x, clamped_y)
 
     def __repr__(self):
         return (
