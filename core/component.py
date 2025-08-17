@@ -20,9 +20,7 @@ class Component:
         pass
 
     def render(self):
-        if not self.active:
-            return
-        pass
+        return []
 
     def stop(self):
         self.started = False

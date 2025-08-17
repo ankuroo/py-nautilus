@@ -80,6 +80,9 @@ class Scene:
         for child in g_object.children:
             self._unregister_tagged_objects_recursive(child)
 
+    def set_active_camera(self, camera):
+        self.active_camera = camera
+
     def set_screen(self, screen):
         self.screen = screen
 
@@ -93,7 +96,8 @@ class Scene:
         self.root.update(dt)
 
     def render(self):
-        self.root.render()
+        calls = self.root.render()
+        self.scene_manager.engine.renderer.add_draw_calls(calls)
 
     def stop(self):
         self.root.stop()

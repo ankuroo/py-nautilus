@@ -9,6 +9,9 @@ class Vector2:
     def __eq__(self, value):
         return self.x == value.x and self.y == value.y
 
+    def __neg__(self):
+        return Vector2(-self.x, -self.y)
+
     def __add__(self, other):
         if isinstance(other, Vector2):
              return Vector2(self.x + other.x, self.y + other.y)
